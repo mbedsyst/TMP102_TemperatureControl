@@ -1,0 +1,35 @@
+#ifndef __TMP102_H__
+#define __TMP102_H__
+
+#define	TMP102_TEMP_REG			0x00
+#define	TMP102_CONF_REG			0x01
+/* note: these bit definitions are byte swapped */
+#define	TMP102_CONF_SD			0x0100
+#define	TMP102_CONF_TM			0x0200
+#define	TMP102_CONF_POL			0x0400
+#define	TMP102_CONF_F0			0x0800
+#define	TMP102_CONF_F1			0x1000
+#define	TMP102_CONF_R0			0x2000
+#define	TMP102_CONF_R1			0x4000
+#define	TMP102_CONF_OS			0x8000
+#define	TMP102_CONF_EM			0x0010
+#define	TMP102_CONF_AL			0x0020
+#define	TMP102_CONF_CR0			0x0040
+#define	TMP102_CONF_CR1			0x0080
+#define	TMP102_TLOW_REG			0x02
+#define	TMP102_THIGH_REG		0x03
+
+#define TMP102_CONFREG_MASK	(TMP102_CONF_SD | TMP102_CONF_TM | \
+				 TMP102_CONF_POL | TMP102_CONF_F0 | \
+				 TMP102_CONF_F1 | TMP102_CONF_OS | \
+				 TMP102_CONF_EM | TMP102_CONF_AL | \
+				 TMP102_CONF_CR0 | TMP102_CONF_CR1)
+
+#define TMP102_CONFIG_CLEAR	(TMP102_CONF_SD | TMP102_CONF_OS | \
+				 TMP102_CONF_CR0)
+#define TMP102_CONFIG_SET	(TMP102_CONF_TM | TMP102_CONF_EM | \
+				 TMP102_CONF_CR1)
+
+#define CONVERSION_TIME_MS		35	/* in milli-seconds */
+
+#endif

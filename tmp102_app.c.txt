@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <time.h>
+
+// Function to get the current timestamp
+char* get_timestamp() {
+    time_t now = time(NULL);
+    struct tm *tm_info = localtime(&now);
+    static char timestamp[20];
+    strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", tm_info);
+    return timestamp;
+}
+
+// Function to simulate reading temperature from TMP102 (replace with actual sensor code)
+float read_temperature() {
+    // Placeholder for actual TMP102 reading code via I2C
+    // Replace with I2C communication to get the real temperature
+    return 42.0; // Example temperature value in Celsius
+}
+
+// Function to log the temperature to a file
+void log_temperature(float temperature) {
+    FILE *file = fopen("/var/log/temperature_log.txt", "a");
+    if (file == NULL) {
+        perror("Failed to open log file");
+        return;
+    }
+    fprintf(file, "[%s] Temperature: %.2f°C\n", get_timestamp(), temperature);
+    fclose(file);
+}
+
+// Function to put Raspberry Pi into sleep mode
+void enter_sleep_mode() {
+    printf("Entering sleep mode...\n");
+    system("systemctl suspend");
+}
+
+// Main program
+int main() {
+    const float THRESHOLD_HIGH = 40.0; // High-temperature threshold (40°C)
+    const float THRESHOLD_LOW = 35.0;  // Low-temperature threshold (35°C)
+    float current_temp;
+
+    while (1) {
+        // Read the current temperature
+        current_temp = read_temperature();
+
+        // Log the temperature to the file
+        log_temperature(current_temp);
+
+        // Check if the temperature exceeds the high threshold
+        if (current_temp > THRESHOLD_HIGH) {
+            printf("Temperature %.2f°C exceeds threshold %.2f°C, entering sleep mode...\n", current_temp, THRESHOLD_HIGH);
+            enter_sleep_mode();
+
+            // After waking up, keep checking until the temperature drops below the low threshold
+            do {
+                sleep(15); // Wait before checking again
+                current_temp = read_temperature();
+                printf("Current temperature after wake: %.2f°C\n", current_temp);
+            } while (current_temp > THRESHOLD_LOW);
+
+            printf("Temperature %.2f°C is below threshold %.2f°C, resuming normal operation...\n", current_temp, THRESHOLD_LOW);
+        }
+
+        // Wait for 15 seconds before taking the next reading
+        sleep(15);
+    }
+
+    return 0;
+}
