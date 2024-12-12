@@ -14,8 +14,8 @@
 
 #define	DRIVER_NAME "tmp102"
 
-struct tmp102 {
-	struct regmap *regmap;
+struct tmp102 
+{
 	u16 config_orig;
 	unsigned long ready_time;
 };
@@ -144,17 +144,6 @@ static bool tmp102_is_volatile_reg(struct device *dev, unsigned int reg)
 	return reg == TMP102_TEMP_REG;
 }
 
-static const struct regmap_config tmp102_regmap_config = {
-	.reg_bits = 8,
-	.val_bits = 16,
-	.max_register = TMP102_THIGH_REG,
-	.writeable_reg = tmp102_is_writeable_reg,
-	.volatile_reg = tmp102_is_volatile_reg,
-	.val_format_endian = REGMAP_ENDIAN_BIG,
-	.cache_type = REGCACHE_MAPLE,
-	.use_single_read = true,
-	.use_single_write = true,
-};
 
 static int tmp102_probe(struct i2c_client *client)
 {
@@ -227,31 +216,6 @@ static int tmp102_probe(struct i2c_client *client)
 	return 0;
 }
 
-static int tmp102_suspend(struct device *dev)
-{
-	struct i2c_client *client = to_i2c_client(dev);
-	struct tmp102 *tmp102 = i2c_get_clientdata(client);
-
-	return regmap_update_bits(tmp102->regmap, TMP102_CONF_REG,
-				  TMP102_CONF_SD, TMP102_CONF_SD);
-}
-
-static int tmp102_resume(struct device *dev)
-{
-	struct i2c_client *client = to_i2c_client(dev);
-	struct tmp102 *tmp102 = i2c_get_clientdata(client);
-	int err;
-
-	err = regmap_update_bits(tmp102->regmap, TMP102_CONF_REG,
-				 TMP102_CONF_SD, 0);
-
-	tmp102->ready_time = jiffies + msecs_to_jiffies(CONVERSION_TIME_MS);
-
-	return err;
-}
-
-static DEFINE_SIMPLE_DEV_PM_OPS(tmp102_dev_pm_ops, tmp102_suspend, tmp102_resume);
-
 static const struct i2c_device_id tmp102_id[] = {
 	{ "tmp102" },
 	{ }
@@ -274,6 +238,6 @@ static struct i2c_driver tmp102_driver = {
 
 module_i2c_driver(tmp102_driver);
 
-MODULE_AUTHOR("Steven King <sfking@fdwdc.com>");
-MODULE_DESCRIPTION("Texas Instruments TMP102 temperature sensor driver");
+MODULE_AUTHOR("Zalman Ul Fariz P A <mbedsyst@gmail.com>");
+MODULE_DESCRIPTION("TMP102 I2C Temperature sensor driver");
 MODULE_LICENSE("GPL");
