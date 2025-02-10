@@ -1,0 +1,26 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+    compatible = "brcm,bcm2835";
+
+    fragment@0 {
+        target = <&i2c1>;
+        __overlay__ {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            status = "okay";
+        };
+    };
+
+    fragment@1 {
+        target = <&i2c1>;
+        __overlay__ {
+            tmp102: tmp102@48 {
+                compatible = "ti,tmp102";
+                reg = <0x48>;  // I2C address of TMP102 sensor
+                status = "okay";
+            };
+        };
+    };
+};
